@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>info.innovors.dnsproxy</string>
+	<key>KeepAlive</key>
+	<true/>
+    <key>ProgramArguments</key>
+    <array>
+		<string>/workspace/dns-https-proxy/venv/bin/python</string>
+        <string>/workspace/dns-https-proxy/dnsproxy.py</string>
+        <string>-u</string>
+        <string>https://sampleuser:sampletoken@your-server:your-https-port/path/to/resolve.php</string>
+        <string>--trustable</string>
+        <string>8.8.8.8</string>
+    </array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+	<string>/Library/Logs/dnsproxy.log</string>
+	<key>StandardOutPath</key>
+	<string>/Library/Logs/dnsproxy.log</string>
+</dict>
+</plist>
