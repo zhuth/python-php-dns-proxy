@@ -1,6 +1,6 @@
 # python-php-dns-proxy
 
-This is an renewed version for [DnsProxy](https://github.com/zhuth/DnsProxy).
+This is an renewed version for [DnsProxy](https://github.com/zhuth/DnsProxy). Note: currently only A records (and CNAME records are reconstructed) are supported, and therefore it is meant for web-browsing uses.
 
 - Put `resolve.php` on your server. The server may use DDNS.
 - Add extra authentication when applicable in order to prevent abuse, e.g. use `.htaccess` and `.htpasswd`.
