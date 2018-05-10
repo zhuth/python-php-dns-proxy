@@ -18,11 +18,10 @@ class ProxyResolver(BaseResolver):
         self.port = port
         self.timeout = timeout
         self.host = self.address.split('://')[1].split('/')[0].split('@')[-1].rsplit(':', 1)[0]
-        for tr in trustable:
-            self.hostrecord = DNSRecord.parse(DNSRecord.question(self.host).send(tr, 53, timeout=self.timeout)).get_a()
-            if self.hostrecord:
-                print('[init] resolved host {} as {}'.format(self.host, self.hostrecord))
-                break
+        self.trustable = trustable
+        self.hostrecord = None
+        self.hostrecord_ttl = 0
+        print('[init] ' + self.host)
 
     def resolve(self, request, handler):
         try:
@@ -30,8 +29,25 @@ class ProxyResolver(BaseResolver):
 
             for q in request.questions:
                 if str(q.qname) == self.host + '.':
+                    if self.hostrecord_ttl <= 0:
+                        self.hostrecord = None
+                        
+                    if self.hostrecord is None:
+                        for tr in self.trustable:
+                            try:
+                                print(tr)
+                                self.hostrecord = DNSRecord.parse(DNSRecord.question(self.host).send(tr, 53, timeout=self.timeout)).get_a()
+                                self.hostrecord_ttl = 50
+                                break
+                            except:
+                                continue
+                    else:
+                        self.hostrecord_ttl -= 1
+
                     resprs.append(self.hostrecord)
+                    print('[host]', self.hostrecord)
                     continue
+           
                 resp = requests.get(self.address + '?domain={domain}&type={type}'.format(**{
                     'domain': str(q.qname),
                     'type': q.qtype
@@ -53,7 +69,11 @@ class ProxyResolver(BaseResolver):
         except socket.timeout:
             reply = request.reply()
             reply.header.rcode = RCODE.NXDOMAIN
-
+        # except:
+#             reply = request.reply()
+#             reply.header.rcode = RCODE.NXDOMAIN
+#             return reply
+            
         return reply
 
 
@@ -118,4 +138,3 @@ if __name__ == '__main__':
 
     while udp_server.isAlive():
         time.sleep(1)
-        
